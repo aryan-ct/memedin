@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { Employee } from "@/lib/types";
 import MemeCard from "@/components/MemeCard";
 import Link from "next/link";
-import { useCameraContext } from "@/lib/CameraContext";
 
 export default function MainPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -14,37 +13,10 @@ export default function MainPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const memeCardRef = useRef<HTMLDivElement | null>(null);
-  const { selectEmployee: setContextEmployee, savedImage } = useCameraContext();
 
   useEffect(() => {
     fetchEmployees();
   }, []);
-
-  // Auto-select employee when modal opens
-  useEffect(() => {
-    if (selectedEmployee && isModalOpen) {
-      setContextEmployee(selectedEmployee.id);
-    } else if (!isModalOpen) {
-      setContextEmployee(null);
-    }
-  }, [selectedEmployee, isModalOpen]);
-
-  // Listen for saved images and refresh the employee list
-  useEffect(() => {
-    if (savedImage) {
-      fetchEmployees();
-      // If modal is open, update the selected employee
-      if (selectedEmployee) {
-        setTimeout(async () => {
-          const response = await fetch(`/api/employees/${selectedEmployee.id}`);
-          if (response.ok) {
-            const updatedEmployee = await response.json();
-            setSelectedEmployee(updatedEmployee);
-          }
-        }, 500);
-      }
-    }
-  }, [savedImage]);
 
   const fetchEmployees = async () => {
     try {
@@ -53,6 +25,48 @@ export default function MainPage() {
       setEmployees(data);
     } catch (error) {
       console.error("Error fetching employees:", error);
+    }
+  };
+
+  const refetchEmployee = async (employeeId: string) => {
+    try {
+      const response = await fetch(`/api/employees/${employeeId}`);
+      if (response.ok) {
+        const updatedEmployee = await response.json();
+        // Update in the employees list
+        setEmployees((prev) =>
+          prev.map((emp) => (emp.id === employeeId ? updatedEmployee : emp))
+        );
+        // Update in modal if it's the selected employee
+        if (selectedEmployee?.id === employeeId) {
+          setSelectedEmployee(updatedEmployee);
+        }
+      }
+    } catch (error) {
+      console.error("Error refetching employee:", error);
+    }
+  };
+
+  const resetEmployeeImage = async (employeeId: string) => {
+    try {
+      const response = await fetch(`/api/employees/${employeeId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageUrl: "" }),
+      });
+      if (response.ok) {
+        const updatedEmployee = await response.json();
+        // Update in the employees list
+        setEmployees((prev) =>
+          prev.map((emp) => (emp.id === employeeId ? updatedEmployee : emp))
+        );
+        // Update in modal if it's the selected employee
+        if (selectedEmployee?.id === employeeId) {
+          setSelectedEmployee(updatedEmployee);
+        }
+      }
+    } catch (error) {
+      console.error("Error resetting employee image:", error);
     }
   };
 
@@ -99,20 +113,14 @@ export default function MainPage() {
             <h1 className="text-5xl font-bold text-white mb-2">MemedIn</h1>
             <p className="text-white/90 text-lg">Host Control Panel</p>
           </div>
-          <div className="flex gap-4">
+          {/* <div className="flex gap-4">
             <Link
               href="/employees"
               className="clay-button px-6 py-3 text-white font-semibold"
             >
               Manage Employees
             </Link>
-            <Link
-              href="/meme-yourself"
-              className="bg-purple-500 hover:bg-purple-600 px-6 py-3 text-white font-semibold rounded-lg transition-all shadow-lg"
-            >
-              📸 Meme Yourself
-            </Link>
-          </div>
+          </div> */}
         </div>
 
         {/* Meme Grid */}
@@ -157,10 +165,20 @@ export default function MainPage() {
 
               {/* Large Meme Card */}
               <div className="mb-6 flex justify-center" ref={memeCardRef}>
-                <MemeCard employee={selectedEmployee} isLarge />
+                <MemeCard
+                  employee={selectedEmployee}
+                  isLarge
+                  showQR={true}
+                />
               </div>
 
-              <div className="mb-6 flex justify-center">
+              <div className="mb-6 flex justify-center gap-4">
+                <button
+                  onClick={() => refetchEmployee(selectedEmployee.id)}
+                  className="bg-blue-500 hover:bg-blue-600 px-6 py-3 text-white font-semibold rounded-lg transition-all shadow-lg"
+                >
+                  🔄 Reload
+                </button>
                 <button
                   onClick={handleDownloadMeme}
                   disabled={!selectedEmployee.imageUrl || isDownloading}
@@ -171,6 +189,21 @@ export default function MainPage() {
                       ? "Preparing..."
                       : "⬇️ Download Meme"
                     : "No meme to download"}
+                </button>
+                <button
+                  onClick={() => {
+                    if (
+                      confirm(
+                        "Are you sure you want to remove this photo? This cannot be undone."
+                      )
+                    ) {
+                      resetEmployeeImage(selectedEmployee.id);
+                    }
+                  }}
+                  disabled={!selectedEmployee.imageUrl}
+                  className="bg-red-500 hover:bg-red-600 px-6 py-3 text-white font-semibold rounded-lg transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  🗑️ Reset
                 </button>
               </div>
             </div>

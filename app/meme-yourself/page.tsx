@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { Employee } from "@/lib/types";
 import MemeCard from "@/components/MemeCard";
-import { useCameraContext } from "@/lib/CameraContext";
-import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
-export default function MemeYourselfPage() {
+function MemeYourselfContent() {
   const [currentEmployee, setCurrentEmployee] = useState<Employee | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [error, setError] = useState<string>("");
@@ -17,17 +16,18 @@ export default function MemeYourselfPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const countdownTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const { selectedEmployeeId, saveImage } = useCameraContext();
+  const searchParams = useSearchParams();
+  const employeeId = searchParams.get("id");
 
-  // Fetch employee when selectedEmployeeId changes
+  // Fetch employee when employeeId from query params changes
   useEffect(() => {
-    if (selectedEmployeeId) {
-      fetchEmployee(selectedEmployeeId);
+    if (employeeId) {
+      fetchEmployee(employeeId);
     } else {
       setCurrentEmployee(null);
       stopCamera();
     }
-  }, [selectedEmployeeId]);
+  }, [employeeId]);
 
   // Start camera when employee is selected
   useEffect(() => {
@@ -145,11 +145,8 @@ export default function MemeYourselfPage() {
         body: JSON.stringify({ imageUrl: capturedImage }),
       });
 
-      // Save to context for real-time update
-      saveImage(capturedImage);
-
       // Show success message
-      alert("Picture saved! ✅ Check the host page to see your meme!");
+      alert("Picture saved! ✅ The host can now reload to see your meme!");
       setCapturedImage(null);
     } catch (error) {
       console.error("Error saving image:", error);
@@ -202,13 +199,12 @@ export default function MemeYourselfPage() {
 
             {!currentEmployee && (
               <div className="clay-card p-12 text-center">
-                <div className="text-6xl mb-6">🎬</div>
+                <div className="text-6xl mb-6">📱</div>
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                  Waiting for Host...
+                  Scan QR Code to Get Started
                 </h2>
                 <p className="text-gray-600 text-lg">
-                  The host needs to select a meme from the Main page to activate
-                  your camera.
+                  Scan the QR code on any meme frame from the host page to take your photo!
                 </p>
               </div>
             )}
@@ -313,5 +309,19 @@ export default function MemeYourselfPage() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function MemeYourselfPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-white text-2xl">Loading...</div>
+        </div>
+      }
+    >
+      <MemeYourselfContent />
+    </Suspense>
   );
 }
