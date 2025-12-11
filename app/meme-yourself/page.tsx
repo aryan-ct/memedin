@@ -102,8 +102,11 @@ function MemeYourselfContent() {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    // Draw video frame to canvas
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // Flip the canvas horizontally to match the mirrored video
+    context.save();
+    context.scale(-1, 1);
+    context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+    context.restore();
 
     // Convert to base64 image
     const imageData = canvas.toDataURL("image/jpeg", 0.9);
@@ -204,7 +207,8 @@ function MemeYourselfContent() {
                   Scan QR Code to Get Started
                 </h2>
                 <p className="text-gray-600 text-lg">
-                  Scan the QR code on any meme frame from the host page to take your photo!
+                  Scan the QR code on any meme frame from the host page to take
+                  your photo!
                 </p>
               </div>
             )}
@@ -235,6 +239,7 @@ function MemeYourselfContent() {
                         playsInline
                         muted
                         className="w-full h-full object-cover"
+                        style={{ transform: "scaleX(-1)" }}
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full bg-black">
@@ -262,11 +267,6 @@ function MemeYourselfContent() {
                     >
                       {countdown ? `⏳ ${countdown}` : "📸 Capture Photo"}
                     </button>
-                    <div className="text-center bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-3 mt-4">
-                      <p className="text-white text-[14px] font-semibold">
-                        Position yourself and click to capture!
-                      </p>
-                    </div>
                   </>
                 )}
 
