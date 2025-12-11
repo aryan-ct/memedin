@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Employee } from '@/lib/types';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import { Employee } from "@/lib/types";
+import Link from "next/link";
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
-  const [formData, setFormData] = useState({ name: '', caption: '' });
+  const [formData, setFormData] = useState({ name: "", caption: "" });
   const [loading, setLoading] = useState(false);
 
   // Fetch employees on mount
@@ -18,11 +18,11 @@ export default function EmployeesPage() {
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch('/api/employees');
+      const response = await fetch("/api/employees");
       const data = await response.json();
       setEmployees(data);
     } catch (error) {
-      console.error('Error fetching employees:', error);
+      console.error("Error fetching employees:", error);
     }
   };
 
@@ -34,8 +34,8 @@ export default function EmployeesPage() {
       if (editingEmployee) {
         // Update existing employee
         const response = await fetch(`/api/employees/${editingEmployee.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
 
@@ -44,9 +44,9 @@ export default function EmployeesPage() {
         }
       } else {
         // Create new employee
-        const response = await fetch('/api/employees', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/employees", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
 
@@ -57,25 +57,25 @@ export default function EmployeesPage() {
 
       closeModal();
     } catch (error) {
-      console.error('Error saving employee:', error);
+      console.error("Error saving employee:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this employee?')) return;
+    if (!confirm("Are you sure you want to delete this employee?")) return;
 
     try {
       const response = await fetch(`/api/employees/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (response.ok) {
         await fetchEmployees();
       }
     } catch (error) {
-      console.error('Error deleting employee:', error);
+      console.error("Error deleting employee:", error);
     }
   };
 
@@ -85,7 +85,7 @@ export default function EmployeesPage() {
       setFormData({ name: employee.name, caption: employee.caption });
     } else {
       setEditingEmployee(null);
-      setFormData({ name: '', caption: '' });
+      setFormData({ name: "", caption: "" });
     }
     setIsModalOpen(true);
   };
@@ -93,7 +93,7 @@ export default function EmployeesPage() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingEmployee(null);
-    setFormData({ name: '', caption: '' });
+    setFormData({ name: "", caption: "" });
   };
 
   return (
@@ -102,7 +102,12 @@ export default function EmployeesPage() {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Memedin</h1>
+            <h1
+              className="text-4xl font-normal text-white mb-2"
+              style={{ fontFamily: "'Rubik Bubbles'" }}
+            >
+              MemedIn
+            </h1>
             <p className="text-white/80">Manage your team members</p>
           </div>
           <div className="flex gap-4">
@@ -163,7 +168,7 @@ export default function EmployeesPage() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="clay-card p-8 max-w-md w-full">
               <h2 className="text-2xl font-bold mb-6 text-gray-800">
-                {editingEmployee ? 'Edit Employee' : 'Add Employee'}
+                {editingEmployee ? "Edit Employee" : "Add Employee"}
               </h2>
 
               <form onSubmit={handleSubmit}>
@@ -174,7 +179,9 @@ export default function EmployeesPage() {
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     className="clay-input w-full px-4 py-3 text-gray-800"
                     required
                   />
@@ -186,7 +193,9 @@ export default function EmployeesPage() {
                   </label>
                   <textarea
                     value={formData.caption}
-                    onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, caption: e.target.value })
+                    }
                     className="clay-input w-full px-4 py-3 text-gray-800 min-h-[100px]"
                     required
                   />
@@ -198,7 +207,7 @@ export default function EmployeesPage() {
                     disabled={loading}
                     className="clay-button flex-1 py-3 text-white font-semibold disabled:opacity-50"
                   >
-                    {loading ? 'Saving...' : 'Save'}
+                    {loading ? "Saving..." : "Save"}
                   </button>
                   <button
                     type="button"

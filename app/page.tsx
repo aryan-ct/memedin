@@ -207,9 +207,11 @@ export default function MainPage() {
               width: "100%",
             }}
           >
-            <h1 className="text-5xl font-bold text-white mb-2">
-              <span>Memed</span>
-              <span>In</span>
+            <h1
+              className="text-5xl font-normal text-white mb-2"
+              style={{ fontFamily: "'Rubik Bubbles'" }}
+            >
+              MemedIn
             </h1>
             <img src={logo.src} alt="" width={"180px"} />
             {/* <p className="text-white/90 text-lg">Host Control Panel</p> */}
@@ -227,7 +229,7 @@ export default function MainPage() {
         {/* Meme Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {employees.map((employee) => (
-            <div key={employee.id} className="clay-card">
+            <div key={employee.id} className="clay-card bg-slate-50">
               <MemeCard
                 employee={employee}
                 onClick={() => handleCardClick(employee)}
@@ -251,7 +253,7 @@ export default function MainPage() {
         {/* Modal */}
         {isModalOpen && selectedEmployee && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-            <div className="bg-gradient-to-br from-purple-100 rounded-3xl p-8 max-w-3xl w-full">
+            <div className="bg-[#e89c3b] rounded-3xl p-8 max-w-3xl w-full">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-3xl font-bold text-gray-800">
                   {selectedEmployee.name}'s Meme
@@ -279,7 +281,7 @@ export default function MainPage() {
                 <button
                   onClick={handleDownloadMeme}
                   disabled={!selectedEmployee.imageUrl || isDownloading}
-                  className="bg-[#ff990a] hover:bg-[#f59106] px-6 py-3 text-white font-semibold rounded-lg transition-all shadow-lg"
+                  className="bg-[#ffffff] hover:bg-[#e6e6e6] px-6 py-3 text-black font-semibold rounded-lg transition-all shadow-lg"
                 >
                   {selectedEmployee.imageUrl
                     ? isDownloading

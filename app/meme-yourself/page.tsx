@@ -166,8 +166,13 @@ function MemeYourselfContent() {
   return (
     <>
       <h1
-        className="text-5xl font-bold text-white mb-2"
-        style={{ width: "100%", textAlign: "center", marginTop: "28px" }}
+        className="text-5xl font-normal text-white mb-2"
+        style={{
+          width: "100%",
+          textAlign: "center",
+          marginTop: "28px",
+          fontFamily: "'Rubik Bubbles'",
+        }}
       >
         MemedIn
       </h1>
