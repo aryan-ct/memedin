@@ -226,11 +226,6 @@ function MemeYourselfContent() {
               >
                 <>
                   <MemeCard employee={currentEmployee} isLarge>
-                    {countdown && !capturedImage && (
-                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-6xl font-bold">
-                        {countdown}
-                      </div>
-                    )}
                     {capturedImage ? (
                       <img
                         src={capturedImage}
@@ -238,14 +233,21 @@ function MemeYourselfContent() {
                         className="w-full h-full object-cover"
                       />
                     ) : stream ? (
-                      <video
-                        ref={videoRef}
-                        autoPlay
-                        playsInline
-                        muted
-                        className="w-full h-full object-cover"
-                        style={{ transform: "scaleX(-1)" }}
-                      />
+                      <>
+                        <video
+                          ref={videoRef}
+                          autoPlay
+                          playsInline
+                          muted
+                          className="w-full h-full object-cover"
+                          style={{ transform: "scaleX(-1)" }}
+                        />
+                        {countdown && (
+                          <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-6xl font-bold z-10">
+                            {countdown}
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <div className="flex items-center justify-center h-full bg-black">
                         <div className="text-white text-center">

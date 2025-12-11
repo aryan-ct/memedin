@@ -51,15 +51,20 @@ export default function MemeCard({
       </div>
 
       {/* Image/Video area - Square aspect ratio */}
-      <div className="bg-gray-200 aspect-square flex items-center justify-center overflow-hidden relative">
+      <div
+        className="bg-gray-200 aspect-square flex items-center justify-center overflow-hidden relative"
+        style={{
+          background: `${
+            employee.imageUrl ? `url(${employee.imageUrl})` : "none"
+          }`,
+          backgroundPosition: employee.imageUrl ? "center" : "",
+          backgroundSize: employee.imageUrl ? "cover" : "",
+        }}
+      >
         {children ? (
           children
         ) : employee.imageUrl ? (
-          <img
-            src={employee.imageUrl}
-            alt={employee.name}
-            className="w-full h-full object-cover"
-          />
+          <></>
         ) : (
           <div className="text-gray-400 text-center p-6 flex flex-col items-center justify-center h-full">
             {showQR && qrCodeUrl ? (

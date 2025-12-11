@@ -88,110 +88,21 @@ export default function MainPage() {
   };
 
   const handleDownloadMeme = async () => {
-    if (!selectedEmployee?.imageUrl) return;
+    if (!selectedEmployee?.imageUrl || !memeCardRef.current) return;
     try {
       setIsDownloading(true);
-
-      // Create a canvas to draw the meme
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("Could not get canvas context");
-
-      // Set canvas size (500x500 for image + padding for text)
-      const imageSize = 500;
-      const padding = 20;
-      const topTextHeight = 80;
-      canvas.width = imageSize + padding * 2;
-      canvas.height = imageSize + topTextHeight + padding * 3;
-
-      // Draw white background with gradient
-      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      gradient.addColorStop(0, "#ffffff");
-      gradient.addColorStop(1, "#fef9f0");
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Draw caption at top
-      ctx.fillStyle = "#000000";
-      ctx.font = "bold 28px Arial, sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-
-      // Word wrap caption
-      const words = selectedEmployee.caption.toUpperCase().split(" ");
-      let line = "";
-      let y = padding + 40;
-      const maxWidth = canvas.width - padding * 2;
-
-      for (let i = 0; i < words.length; i++) {
-        const testLine = line + words[i] + " ";
-        const metrics = ctx.measureText(testLine);
-        if (metrics.width > maxWidth && i > 0) {
-          ctx.fillText(line, canvas.width / 2, y);
-          line = words[i] + " ";
-          y += 35;
-        } else {
-          line = testLine;
-        }
-      }
-      ctx.fillText(line, canvas.width / 2, y);
-
-      // Load and draw the employee image
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-        img.src = selectedEmployee.imageUrl!;
+      const html2canvas = (await import("html2canvas")).default;
+      const canvas = await html2canvas(memeCardRef.current, {
+        backgroundColor: null,
+        scale: 2,
       });
-
-      // Draw image in square area with proper aspect ratio (object-fit: cover)
-      const imageY = topTextHeight + padding * 2;
-
-      // Calculate dimensions to crop center of image to fit square
-      const imgAspect = img.width / img.height;
-      let sx = 0,
-        sy = 0,
-        sWidth = img.width,
-        sHeight = img.height;
-
-      if (imgAspect > 1) {
-        // Image is wider - crop sides
-        sWidth = img.height;
-        sx = (img.width - sWidth) / 2;
-      } else if (imgAspect < 1) {
-        // Image is taller - crop top/bottom
-        sHeight = img.width;
-        sy = (img.height - sHeight) / 2;
-      }
-
-      ctx.drawImage(
-        img,
-        sx,
-        sy,
-        sWidth,
-        sHeight, // Source rectangle (crop)
-        padding,
-        imageY,
-        imageSize,
-        imageSize // Destination rectangle (square)
-      );
-
-      // Convert to blob and download
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          throw new Error("Failed to create image blob");
-        }
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `${selectedEmployee.name}-meme.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-      }, "image/png");
+      const dataUrl = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = `${selectedEmployee.name}-meme.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (err) {
       console.error("Failed to download meme", err);
       alert("Unable to download meme right now. Please try again.");
