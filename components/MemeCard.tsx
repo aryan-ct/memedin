@@ -55,7 +55,7 @@ export default function MemeCard({
         className="bg-gray-200 aspect-square flex items-center justify-center overflow-hidden relative"
         style={{
           background: `${
-            employee.imageUrl ? `url(${employee.imageUrl})` : "none"
+            employee.imageUrl ? `url(${employee.imageUrl})` : "#e6e7eb"
           }`,
           backgroundPosition: employee.imageUrl ? "center" : "",
           backgroundSize: employee.imageUrl ? "cover" : "",
