@@ -43,7 +43,7 @@ export default function MemeCard({
       <div className="bg-white px-4 pt-3 pb-6 text-center">
         <p
           className={`text-black font-bold ${
-            isLarge ? "text-2xl" : "text-lg"
+            isLarge ? "text-2xl" : "text-[0.8rem]"
           } uppercase tracking-wide leading-tight`}
         >
           {employee.caption}
@@ -95,7 +95,6 @@ export default function MemeCard({
             )}
           </div>
         )}
-
       </div>
 
       {/* Name at bottom */}
