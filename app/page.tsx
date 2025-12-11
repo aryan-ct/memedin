@@ -19,11 +19,22 @@ export default function MainPage() {
     fetchEmployees();
   }, []);
 
+  // Fisher-Yates shuffle algorithm
+  const shuffleArray = <T,>(array: T[]): T[] => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
   const fetchEmployees = async () => {
     try {
       const response = await fetch("/api/employees");
       const data = await response.json();
-      setEmployees(data);
+      // Shuffle the employees for random order
+      setEmployees(shuffleArray(data));
     } catch (error) {
       console.error("Error fetching employees:", error);
     }
@@ -255,8 +266,15 @@ export default function MainPage() {
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
             <div className="bg-[#e89c3b] rounded-3xl p-8 max-w-3xl w-full">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-bold text-gray-800">
-                  {selectedEmployee.name}'s Meme
+                <h2
+                  className="text-4xl font-normal text-gray-800"
+                  style={{
+                    textAlign: "center",
+                    width: "100%",
+                    fontFamily: "'Rubik Bubbles'",
+                  }}
+                >
+                  {selectedEmployee.name}
                 </h2>
                 <button
                   onClick={closeModal}
